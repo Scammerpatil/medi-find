@@ -7,21 +7,19 @@ export interface Order {
   user: User | null;
   store: MedicalStore | null;
   deliveryBoy: DeliveryBoy | null;
-  medicines: [
-    {
-      medicineId: String;
-      name: String;
-      quantity: Number;
-      price: Number;
-    }
-  ];
+  medicines: {
+    medicineId: string;
+    name: string;
+    quantity: number;
+    price: number;
+  }[];
   prescriptionId: String;
   totalAmount: Number;
   paymentMethod: "COD" | "ONLINE";
   status: "Pending" | "Processing" | "Dispatched" | "Delivered" | "Cancelled";
   paymentStatus: "Pending" | "Paid";
-  createdAt: Date;
-  updatedAt: Date;
+  createdAt?: Date;
+  updatedAt?: Date;
   pickupLocation: {
     type: "Point";
     coordinates: [Number, Number];

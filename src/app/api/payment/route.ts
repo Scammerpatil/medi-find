@@ -9,7 +9,6 @@ const razorpay = new Razorpay({
 
 export async function POST(req: NextRequest) {
   const { orderId, amount } = await req.json();
-  console.log(orderId, amount);
   if (!orderId || !amount) {
     return NextResponse.json(
       { message: "Invalid request body" },
@@ -18,13 +17,18 @@ export async function POST(req: NextRequest) {
   }
   try {
     const order = await Order.findById(orderId);
+    if (!order || order.paymentStatus === "Paid") {
+      return NextResponse.json(
+        { message: "Order not found or already paid" },
+        { status: 400 }
+      );
+    }
     var options = {
       amount: amount * 100,
       currency: "INR",
       receipt: `rcp_${Date.now()}`,
     };
     const paymentOrder = await razorpay.orders.create(options);
-    console.log(paymentOrder);
     if (!paymentOrder) {
       return NextResponse.json(
         { message: "Order creation failed!" },
@@ -37,8 +41,8 @@ export async function POST(req: NextRequest) {
     return NextResponse.json(
       {
         message: "Payment successful",
-        orderId: order.id,
-        amount: order.amount,
+        orderId: paymentOrder.id,
+        amount: paymentOrder.amount,
       },
       { status: 200 }
     );

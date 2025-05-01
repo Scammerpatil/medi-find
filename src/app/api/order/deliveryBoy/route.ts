@@ -8,11 +8,10 @@ export async function GET(req: NextRequest) {
   const token = req.cookies.get("token")?.value as string;
   const decoded = jwt.verify(token, process.env.JWT_SECRET!) as any;
   try {
-    const orders = await Order.find({ user: decoded.id })
+    const orders = await Order.find({ deliveryBoy: decoded.id })
       .populate("user")
       .populate("store")
-      .populate("deliveryBoy")
-      .sort({ createdAt: -1 });
+      .populate("deliveryBoy");
     return NextResponse.json(orders, { status: 200 });
   } catch (error) {
     console.log(error);

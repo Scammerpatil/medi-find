@@ -3,13 +3,13 @@
 import { useState } from "react";
 import axios, { AxiosResponse } from "axios";
 import { useAuth } from "@/context/AuthProvider";
-import { User } from "@/types/user";
+import { User } from "@/types/User";
 import toast from "react-hot-toast";
 import { IconCloudUpload } from "@tabler/icons-react";
 
 const MyAccount = () => {
   const { user } = useAuth();
-
+  console.log(user);
   if (!user) return <div>Loading...</div>;
   const [formData, setFormData] = useState<User>(user);
   const [editing, setEditing] = useState(false);
@@ -42,7 +42,7 @@ const MyAccount = () => {
         success: (data: AxiosResponse) => {
           setFormData({
             ...user,
-            profilePicture: data.data.data.url,
+            profileImage: data.data.data.url,
           });
           return "Image Uploaded Successfully";
         },
@@ -55,7 +55,6 @@ const MyAccount = () => {
       });
     }
   };
-
   return (
     <div className="-m-7">
       <div className="grid grid-cols-1 pt-6 xl:grid-cols-3 xl:gap-4">
@@ -64,7 +63,7 @@ const MyAccount = () => {
             <div className="items-center sm:flex xl:block 2xl:flex sm:space-x-4 xl:space-x-0 2xl:space-x-4">
               <img
                 className="mb-4 rounded-lg w-28 h-28 sm:mb-0 xl:mb-4 2xl:mb-0"
-                src={user.profilePicture}
+                src={user.profileImage}
                 alt={user.name}
               />
               <div>
@@ -131,9 +130,9 @@ const MyAccount = () => {
                 <input
                   type="tel"
                   id="phone"
-                  value={formData.phone || ""}
+                  value={formData.contact || ""}
                   onChange={(e) => {
-                    setFormData({ ...formData, phone: e.target.value });
+                    setFormData({ ...formData, contact: e.target.value });
                   }}
                   disabled={!editing}
                   className="input input-primary w-full"
@@ -171,136 +170,17 @@ const MyAccount = () => {
               Address <span className="text-error">*</span>
             </label>
             <textarea
-              value={formData.address.address || ""}
+              value={formData.address || ""}
               onChange={(e) => {
                 setFormData({
                   ...formData,
-                  address: {
-                    ...formData.address,
-                    address: e.target.value,
-                  },
+                  address: e.target.value,
                 });
               }}
               disabled={!editing}
               className="textarea textarea-primary w-full"
               required
             />
-          </div>
-          <div className="flex flex-wrap gap-3 w-full">
-            <div>
-              <label
-                htmlFor="first-name"
-                className="block mb-2 text-sm font-medium text-base-content"
-              >
-                City <span className="text-error">*</span>
-              </label>
-              <input
-                type="text"
-                value={formData.address.city || ""}
-                onChange={(e) => {
-                  setFormData({
-                    ...formData,
-                    address: {
-                      ...formData.address,
-                      city: e.target.value,
-                    },
-                  });
-                }}
-                disabled={!editing}
-                className="input input-primary w-full"
-                required
-              />
-            </div>
-            <div>
-              <label
-                htmlFor="first-name"
-                className="block mb-2 text-sm font-medium text-base-content"
-              >
-                State <span className="text-error">*</span>
-              </label>
-              <input
-                type="text"
-                value={formData.address.state || ""}
-                onChange={(e) => {
-                  setFormData({
-                    ...formData,
-                    address: {
-                      ...formData.address,
-                      state: e.target.value,
-                    },
-                  });
-                }}
-                disabled={!editing}
-                className="input input-primary w-full"
-                required
-              />
-            </div>
-            <div>
-              <label
-                htmlFor="first-name"
-                className="block mb-2 text-sm font-medium text-base-content"
-              >
-                Country <span className="text-error">*</span>
-              </label>
-              <input
-                type="text"
-                value={formData.address.country || ""}
-                readOnly
-                disabled={!editing}
-                className="input input-primary w-full"
-                required
-              />
-            </div>
-            <div>
-              <label
-                htmlFor="first-name"
-                className="block mb-2 text-sm font-medium text-base-content"
-              >
-                LandMark <span className="text-error">*</span>
-              </label>
-              <input
-                type="text"
-                value={formData.address.landmark || ""}
-                onChange={(e) => {
-                  setFormData({
-                    ...formData,
-                    address: {
-                      ...formData.address,
-                      landmark: e.target.value,
-                    },
-                  });
-                }}
-                disabled={!editing}
-                className="input input-primary w-full"
-                required
-              />
-            </div>
-            <div>
-              <label
-                htmlFor="first-name"
-                className="block mb-2 text-sm font-medium text-base-content"
-              >
-                Pin Code <span className="text-error">*</span>
-              </label>
-              <input
-                type="text"
-                minLength={6}
-                maxLength={6}
-                value={formData.address.postalCode || ""}
-                onChange={(e) => {
-                  setFormData({
-                    ...formData,
-                    address: {
-                      ...formData.address,
-                      postalCode: e.target.value,
-                    },
-                  });
-                }}
-                disabled={!editing}
-                className="input input-primary w-full"
-                required
-              />
-            </div>
           </div>
         </div>
       </div>

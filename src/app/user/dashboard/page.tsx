@@ -7,19 +7,9 @@ import {
   YAxis,
   Tooltip,
   ResponsiveContainer,
-  PieChart,
-  Pie,
-  Cell,
 } from "recharts";
-import {
-  IconHeart,
-  IconHome,
-  IconCalendar,
-  IconUser,
-} from "@tabler/icons-react";
+import { IconHome, IconCalendar } from "@tabler/icons-react";
 import { useAuth } from "@/context/AuthProvider";
-
-const COLORS = ["#8884d8", "#82ca9d", "#ffc658"];
 
 const UserDashboard = () => {
   const [data, setData] = useState<any>({});
@@ -36,7 +26,6 @@ const UserDashboard = () => {
   }, []);
 
   const bookingData = data.bookingsByMonth || [];
-  const wishlistCategories = data.wishlistCategories || [];
 
   return (
     <>
@@ -54,17 +43,6 @@ const UserDashboard = () => {
             {data.totalBookings || 0}
           </div>
           <div className="stat-desc">Your lifetime bookings</div>
-        </div>
-
-        <div className="stat">
-          <div className="stat-figure text-secondary">
-            <IconHeart className="h-8 w-8" />
-          </div>
-          <div className="stat-title">Wishlist Items</div>
-          <div className="stat-value text-secondary">
-            {data.wishlistCount || 0}
-          </div>
-          <div className="stat-desc">Loved Properties</div>
         </div>
 
         <div className="stat">
@@ -91,47 +69,18 @@ const UserDashboard = () => {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
-        <div className="bg-base-200 p-4 rounded-xl shadow-md">
-          <h2 className="text-xl font-semibold text-center mb-4">
-            Bookings Over Time
-          </h2>
-          <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={bookingData}>
-              <XAxis dataKey="month" />
-              <YAxis allowDecimals={false} />
-              <Tooltip />
-              <Bar dataKey="count" fill="#82ca9d" />
-            </BarChart>
-          </ResponsiveContainer>
-        </div>
-
-        <div className="bg-base-200 p-4 rounded-xl shadow-md">
-          <h2 className="text-xl font-semibold text-center mb-4">
-            Wishlist Category Distribution
-          </h2>
-          <ResponsiveContainer width="100%" height={300}>
-            <PieChart>
-              <Pie
-                data={wishlistCategories}
-                dataKey="value"
-                nameKey="category"
-                cx="50%"
-                cy="50%"
-                outerRadius={110}
-                label
-              >
-                {wishlistCategories.map((entry: any, index: number) => (
-                  <Cell
-                    key={`cell-${index}`}
-                    fill={COLORS[index % COLORS.length]}
-                  />
-                ))}
-              </Pie>
-              <Tooltip />
-            </PieChart>
-          </ResponsiveContainer>
-        </div>
+      <div className="bg-base-200 p-4 rounded-xl shadow-md mt-6">
+        <h2 className="text-xl font-semibold text-center mb-4">
+          Bookings Over Time
+        </h2>
+        <ResponsiveContainer width="100%" height={300}>
+          <BarChart data={bookingData}>
+            <XAxis dataKey="month" />
+            <YAxis allowDecimals={false} />
+            <Tooltip />
+            <Bar dataKey="count" fill="#82ca9d" />
+          </BarChart>
+        </ResponsiveContainer>
       </div>
     </>
   );

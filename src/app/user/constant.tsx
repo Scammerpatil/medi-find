@@ -20,11 +20,6 @@ export const SIDENAV_ITEMS: SideNavItem[] = [
     icon: <IconSearch size={24} />,
   },
   {
-    title: "Upload Prescription",
-    path: "/user/upload-prescription",
-    icon: <IconFileUpload size={24} />,
-  },
-  {
     title: "My Orders",
     path: "/user/orders",
     icon: <IconShoppingCart size={24} />,

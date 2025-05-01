@@ -1,7 +1,8 @@
 "use client";
 import { useCart } from "@/context/CartContext";
 import { Medicine } from "@/types/Medicine";
-import { IconSearch } from "@tabler/icons-react";
+import haversine from "haversine-distance";
+import { IconAlertSquareRoundedFilled, IconSearch } from "@tabler/icons-react";
 import { useEffect, useState } from "react";
 
 const ITEMS_PER_PAGE = 6;
@@ -12,6 +13,10 @@ const MedicinesPage = () => {
   const [search, setSearch] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const { addToCart } = useCart();
+  const [coordinates, setCoordinates] = useState({
+    lat: 0,
+    lng: 0,
+  });
 
   useEffect(() => {
     const fetchMedicines = async () => {
@@ -20,6 +25,12 @@ const MedicinesPage = () => {
       setMedicines(data);
       setLoading(false);
     };
+    navigator.geolocation.getCurrentPosition((pos) => {
+      setCoordinates({
+        lat: pos.coords.latitude,
+        lng: pos.coords.longitude,
+      });
+    });
 
     fetchMedicines();
   }, []);
@@ -41,7 +52,15 @@ const MedicinesPage = () => {
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
-    window.scrollTo(0, 0);
+    (document.getElementById("main-content") as HTMLElement).scrollTop = 0;
+  };
+
+  const getDistance = (pickup: any, coordinates: any) => {
+    const distance = haversine(
+      { lat: pickup.coordinates[1], lon: pickup.coordinates[0] },
+      { lat: coordinates.lat, lon: coordinates.lng }
+    );
+    return (distance / 1000).toFixed(2);
   };
 
   return (
@@ -64,6 +83,21 @@ const MedicinesPage = () => {
           />
         </label>
         <input />
+        <div role="alert" className="alert alert-info">
+          <IconAlertSquareRoundedFilled size={16} />
+          <span>
+            <strong>Note:</strong> Each "piece" refers to a single tablet. For
+            example, ordering <strong>1 piece</strong> means you will receive{" "}
+            <strong>1 tablet</strong>.
+            <br />
+            If you wish to purchase an entire strip (which typically contains 15
+            tablets), please enter <strong>15 pieces</strong> when placing your
+            order.
+            <br />
+            Always ensure you specify the exact quantity of tablets required to
+            avoid confusion.
+          </span>
+        </div>
       </div>
 
       {loading ? (
@@ -100,12 +134,12 @@ const MedicinesPage = () => {
                 <div className="card-body">
                   <h2 className="card-title">{medicine.name}</h2>
                   <p className="text-sm text-base-content/60">
-                    {medicine.description.slice(0, 100)}...
+                    {medicine.description || "No description available."}
                   </p>
 
                   <div className="mt-2 space-y-1">
                     <p className="font-bold text-lg text-primary">
-                      ₹{medicine.price}
+                      ₹{medicine.price} / Per Piece
                     </p>
 
                     <div className="flex gap-2 flex-wrap mt-2">
@@ -119,9 +153,20 @@ const MedicinesPage = () => {
                         </span>
                       )}
                       {medicine.stock > 0 ? (
-                        <span className="badge badge-info">
-                          In Stock: {medicine.stock}
-                        </span>
+                        <>
+                          <span className="badge badge-info">
+                            In Stock: {medicine.stock} / Pieces
+                          </span>
+                          <span
+                            className={`badge ${
+                              medicine.stock < 10
+                                ? "badge-error"
+                                : "badge-success"
+                            } `}
+                          >
+                            {medicine.stock > 10 ? "In Stock" : "Low Stock"}
+                          </span>
+                        </>
                       ) : (
                         <span className="badge badge-outline badge-error">
                           Out of Stock
@@ -130,7 +175,8 @@ const MedicinesPage = () => {
                     </div>
 
                     <p className="text-sm text-base-content/40 mt-1 italic">
-                      From: {medicine.store.name || "Unknown Store"}
+                      From: {medicine.store.name || "Unknown Store"} -{" "}
+                      {getDistance(medicine.store.coordinates, coordinates)} km
                     </p>
 
                     <button

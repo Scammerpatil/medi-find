@@ -108,15 +108,6 @@ const AdminDashboard = () => {
         </div>
 
         <div className="stat">
-          <div className="stat-figure text-info">
-            <IconPackage className="h-8 w-8" />
-          </div>
-          <div className="stat-title">Total Orders</div>
-          <div className="stat-value text-info">{dashboardData.orders}</div>
-          <div className="stat-desc">Medicines delivered</div>
-        </div>
-
-        <div className="stat">
           <div className="stat-figure text-warning">
             <div className="avatar online">
               <div className="w-16 rounded-full">
@@ -124,11 +115,9 @@ const AdminDashboard = () => {
               </div>
             </div>
           </div>
-          <div className="stat-title">Feedbacks</div>
-          <div className="stat-value text-warning">
-            {dashboardData.feedback}
-          </div>
-          <div className="stat-desc">Collected from customers</div>
+          <div className="stat-title">Total Orders</div>
+          <div className="stat-value text-pretty">{dashboardData.orders}</div>
+          <div className="stat-desc">Medicines delivered</div>
         </div>
       </div>
 
@@ -136,7 +125,7 @@ const AdminDashboard = () => {
         {/* Order stats per city */}
         <div className="bg-base-200 rounded-xl p-4 shadow-md w-full md:w-1/2">
           <h2 className="text-xl font-semibold text-center mb-4">
-            Orders by City
+            Orders by Medical Store City
           </h2>
           <ResponsiveContainer width="100%" height={300}>
             <BarChart data={orderStats}>

@@ -12,8 +12,8 @@ const CartPage = () => {
   const [order, setOrder] = useState<Order>({
     user: null,
     store: null,
-    deliveyBoy: null,
-    medicine: [
+    deliveryBoy: null,
+    medicines: [
       {
         medicineId: "",
         name: "",
@@ -25,6 +25,7 @@ const CartPage = () => {
     totalAmount: 0,
     paymentMethod: "COD",
     status: "Pending",
+    paymentStatus: "Pending",
     pickupLocation: {
       type: "Point",
       coordinates: [0, 0],
@@ -112,17 +113,48 @@ const CartPage = () => {
   }
 
   const handlePlaceOrder = (payment: "COD" | "ONLINE") => {
-    setOrder({
-      ...order,
-      user: user,
-      paymentMethod: payment,
+    const medicines = cart.map((item) => ({
+      medicineId: item.medicineId,
+      name: item.name,
+      price: item.price,
+      quantity: item.quantity,
+    }));
+    const prescriptionId = requiresPrescription ? order.prescriptionId : null;
+    const paymentMethod = payment;
+
+    const res = axios.post("/api/order/place-order", {
+      medicines,
+      prescriptionId,
+      paymentMethod,
       totalAmount: finalTotal,
     });
-    const res = axios.post("/api/order/place-order", { order });
     toast.promise(res, {
       loading: "Wait a minute placing your order!!!",
-      success: () => {
+      success: (res: AxiosResponse) => {
         clearCart();
+        if (payment === "ONLINE") {
+          const options = {
+            key: "rzp_test_cXJvckaWoN0JQx",
+            amount: finalTotal * 100,
+            currency: "INR",
+            name: "MediFind",
+            description: "Medicine Order Payment",
+            order_id: res.data.orderId,
+            handler: () => {
+              toast.success("Payment Successful!");
+            },
+            prefill: {
+              name: user?.name,
+              email: user?.email,
+              contact: user?.contact,
+            },
+          };
+          const rzp = new (window as any).Razorpay(options);
+          rzp.on("payment.failed", function (response: any) {
+            toast.error(response.error.description);
+          });
+          rzp.open();
+        }
         return "Order placed successfully";
       },
       error: "Oops!!! Something went wrong!!!",
@@ -216,6 +248,10 @@ const CartPage = () => {
         <button className="btn btn-error" onClick={clearCart}>
           Clear Cart
         </button>
+        <div className="text-lg font-semibold">
+          <span>Total Amount: </span>
+          <span className="text-accent">₹{finalTotal}</span>
+        </div>
       </div>
 
       {!isCheckoutDisabled && (

@@ -54,10 +54,14 @@ const StoreOrdersPage = () => {
               <th>#</th>
               <th>Customer</th>
               <th>Medicines</th>
+              <th>Precription</th>
+              <th>Drop Address</th>
               <th>Total</th>
               <th>Payment</th>
               <th>Status</th>
               <th>Assign Delivery</th>
+              <th>Action</th>
+              <th>Date</th>
             </tr>
           </thead>
           <tbody>
@@ -74,22 +78,55 @@ const StoreOrdersPage = () => {
                     ))}
                   </ul>
                 </td>
+                <td>
+                  {order.prescriptionId ? (
+                    <a
+                      href={String(order.prescriptionId)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="link link-primary underline"
+                    >
+                      View Prescription
+                    </a>
+                  ) : (
+                    "No Prescription"
+                  )}
+                </td>
+                <td>
+                  {order.user?.address}
+                  <br />
+                  <a
+                    className="text-sm text-primary font-semibold"
+                    target="_blank"
+                    href={`https://www.google.com/maps/search/?api=1&query=${order.dropLocation.coordinates[1]},${order.dropLocation.coordinates[0]}`}
+                  >
+                    View on Map
+                  </a>
+                </td>
                 <td>₹ {String(order.totalAmount)}</td>
                 <td>
                   {order.paymentMethod} - {order.paymentStatus}
                 </td>
                 <td>{order.status}</td>
                 <td>
-                  {order.deliveryBoy !== null ? (
-                    <span className="text-green-500 font-semibold">
-                      {order.deliveryBoy.name}
+                  {order.deliveryBoy !== null ||
+                  order.status === "Cancelled" ? (
+                    <span
+                      className={` ${
+                        order.status !== "Cancelled"
+                          ? "text-success"
+                          : "text-error"
+                      } font-semibold`}
+                    >
+                      {order?.deliveryBoy?.name}
+                      {order.status === "Cancelled" && "Cancelled"}
                     </span>
                   ) : (
                     <select
                       className="select select-sm select-bordered"
                       defaultValue=""
                       onChange={(e) =>
-                        assignDeliveryBoy(order._id, e.target.value)
+                        assignDeliveryBoy(order._id!, e.target.value)
                       }
                     >
                       <option disabled value="">
@@ -110,6 +147,31 @@ const StoreOrdersPage = () => {
                     </select>
                   )}
                 </td>
+                <td>
+                  {order.status !== "Cancelled" ? (
+                    <button
+                      className="btn btn-sm btn-error"
+                      onClick={async () => {
+                        const res = axios.get(
+                          `/api/order/update-status?id=${order._id}&status=Cancelled`
+                        );
+                        toast.promise(res, {
+                          loading: "Cancelling order...",
+                          success: "Order cancelled!",
+                          error: "Failed to cancel order",
+                        });
+                        location.reload();
+                      }}
+                    >
+                      Cancel Order
+                    </button>
+                  ) : (
+                    <button className="btn btn-sm btn-disabled">
+                      Cancelled
+                    </button>
+                  )}
+                </td>
+                <td>{new Date(order.createdAt!).toLocaleDateString()}</td>
               </tr>
             ))}
           </tbody>

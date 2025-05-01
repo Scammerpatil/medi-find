@@ -11,11 +11,11 @@ const UserOrdersPage = () => {
   const [orders, setOrders] = useState([]);
   const { user } = useAuth();
 
+  const fetchOrders = async () => {
+    const res = await axios.get("/api/order/user");
+    setOrders(res.data);
+  };
   useEffect(() => {
-    const fetchOrders = async () => {
-      const res = await axios.get("/api/order/user");
-      setOrders(res.data);
-    };
     fetchOrders();
   }, []);
 
@@ -27,15 +27,16 @@ const UserOrdersPage = () => {
         amount: order.totalAmount,
       });
       toast.dismiss();
-
+      console.log(paymentRes);
       const options = {
         key: "rzp_test_cXJvckaWoN0JQx",
-        amount: paymentRes.data.amount,
+        amount: paymentRes.data.amount || order.totalAmount * 100,
         currency: "INR",
         name: "MediFind",
         description: "Medicine Order Payment",
         order_id: paymentRes.data.orderId,
         handler: () => {
+          fetchOrders();
           toast.success("Payment Successful!");
         },
         prefill: {
@@ -101,10 +102,14 @@ const UserOrdersPage = () => {
                 <td>
                   {order.paymentMethod} - {order.paymentStatus}
                 </td>
-                <td>{order.status}</td>
                 <td>
-                  {order.paymentMethod === "COD" &&
-                  order.paymentStatus === "Pending" ? (
+                  <span className="btn btn-outline">{order.status}</span>
+                </td>
+                <td>
+                  {(order.paymentMethod === "COD" &&
+                    order.paymentStatus === "Pending") ||
+                  (order.paymentMethod === "ONLINE" &&
+                    order.paymentStatus === "Pending") ? (
                     <button
                       className="btn btn-primary btn-sm"
                       onClick={() => payNow(order)}
@@ -112,7 +117,7 @@ const UserOrdersPage = () => {
                       Pay Now
                     </button>
                   ) : (
-                    "-"
+                    <p className="btn btn-success">Already Paid</p>
                   )}
                 </td>
               </tr>

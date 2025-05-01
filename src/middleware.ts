@@ -76,5 +76,6 @@ export const config = {
     "/user/:path*",
     "/medical-store/:path*",
     "/delivery-boy/:path*",
+    "/admin/:path*",
   ],
 };

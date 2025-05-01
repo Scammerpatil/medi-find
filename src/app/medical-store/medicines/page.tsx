@@ -11,10 +11,26 @@ const StoreMedicinesPage = () => {
   const [form, setForm] = useState<Partial<Medicine>>({});
   const [isEditing, setIsEditing] = useState(false);
   const [editId, setEditId] = useState<string | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const medicinesPerPage = 6;
+  const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
     fetchMedicines();
   }, []);
+
+  const filteredMedicines = medicines.filter((medicine) =>
+    medicine.name.toLowerCase().includes(searchQuery)
+  );
+
+  const indexOfLastMedicine = currentPage * medicinesPerPage;
+  const indexOfFirstMedicine = indexOfLastMedicine - medicinesPerPage;
+  const currentMedicines = filteredMedicines.slice(
+    indexOfFirstMedicine,
+    indexOfLastMedicine
+  );
+
+  const totalPages = Math.ceil(filteredMedicines.length / medicinesPerPage);
 
   const fetchMedicines = async () => {
     setLoading(true);
@@ -41,18 +57,24 @@ const StoreMedicinesPage = () => {
     }
 
     if (isEditing && editId) {
-      const res = await fetch(`/api/store/medicines/${editId}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
+      const res = axios.put(`/api/medicines/update-medicine?id=${editId}`, {
+        form,
       });
-      if (res.ok) {
-        toast.success("Medicine updated!");
-        setForm({});
-        setIsEditing(false);
-        setEditId(null);
-        fetchMedicines();
-      }
+      toast.promise(res, {
+        loading: "Updating medicine...",
+        success: () => {
+          setForm({});
+          fetchMedicines();
+          setIsEditing(false);
+          setEditId(null);
+          return "Medicine updated!";
+        },
+        error: (err) => {
+          return `Error: ${
+            err.response?.data?.message || "Something went wrong"
+          }`;
+        },
+      });
     } else {
       const res = axios.post("/api/medicines/add-medicines", { form });
       toast.promise(res, {
@@ -76,6 +98,7 @@ const StoreMedicinesPage = () => {
     setIsEditing(true);
     setEditId(medicine._id);
     window.scrollY = 0;
+    toast("Edit mode activated");
   };
 
   const handleDelete = async (id: string) => {
@@ -187,6 +210,13 @@ const StoreMedicinesPage = () => {
             }}
             className="file file-input file-input-primary w-full"
           />
+          {isEditing && (
+            <img
+              src={form.imageUrl}
+              alt="Medicine"
+              className="h-48 w-full object-cover mb-4"
+            />
+          )}
           <label className="flex items-center gap-2">
             <input
               type="checkbox"
@@ -204,6 +234,18 @@ const StoreMedicinesPage = () => {
           >
             {isEditing ? "Update Medicine" : "Add Medicine"}
           </button>
+          {isEditing && (
+            <button
+              onClick={() => {
+                setIsEditing(false);
+                setForm({});
+                setEditId(null);
+              }}
+              className="btn btn-outline btn-error w-full"
+            >
+              Cancel Edit
+            </button>
+          )}
         </div>
       </div>
 
@@ -212,17 +254,30 @@ const StoreMedicinesPage = () => {
         Your Medicines
       </h2>
 
+      <div className="max-w-md mx-auto mb-6">
+        <input
+          type="text"
+          placeholder="Search medicines..."
+          value={searchQuery}
+          onChange={(e) => {
+            setSearchQuery(e.target.value.toLowerCase());
+            setCurrentPage(1);
+          }}
+          className="input input-bordered input-primary w-full"
+        />
+      </div>
+
       {loading ? (
         <div className="flex justify-center">
           <span className="loading loading-spinner loading-lg"></span>
         </div>
-      ) : medicines.length === 0 ? (
+      ) : currentMedicines.length === 0 ? (
         <p className="text-center text-base-content/50 text-2xl">
           No medicines found.
         </p>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {medicines.map((medicine) => (
+          {currentMedicines.map((medicine) => (
             <div key={medicine._id} className="card bg-base-300 shadow-xl">
               <figure>
                 <img
@@ -238,7 +293,12 @@ const StoreMedicinesPage = () => {
                 </p>
                 <p className="font-bold mt-2">₹{medicine.price} / Per Piece</p>
                 <p className="text-sm">
-                  Stock: {medicine.stock > 0 ? medicine.stock : "Out of Stock"}
+                  Stock: {medicine.stock > 0 ? medicine.stock : "Out of Stock"}{" "}
+                  / Pieces
+                </p>
+                <p className="text-sm">
+                  Prescription Required:{" "}
+                  {medicine.prescriptionRequired ? "Yes" : "No"}
                 </p>
                 <div className="flex flex-row gap-2 mt-4 items-center">
                   <button
@@ -257,6 +317,27 @@ const StoreMedicinesPage = () => {
               </div>
             </div>
           ))}
+        </div>
+      )}
+      {totalPages > 1 && (
+        <div className="flex justify-center items-center mt-8 gap-4">
+          <button
+            className="btn btn-outline btn-accent"
+            disabled={currentPage === 1}
+            onClick={() => setCurrentPage((prev) => prev - 1)}
+          >
+            Previous
+          </button>
+          <span className="text-lg font-medium">
+            Page {currentPage} of {totalPages}
+          </span>
+          <button
+            className="btn btn-outline btn-accent"
+            disabled={currentPage === totalPages}
+            onClick={() => setCurrentPage((prev) => prev + 1)}
+          >
+            Next
+          </button>
         </div>
       )}
     </>

@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import jwt from "jsonwebtoken";
 import Order from "@/models/Order";
+import dbConfig from "@/middlewares/db.config";
+
+dbConfig();
 
 export async function GET(req: NextRequest) {
   const token = req.cookies.get("token")?.value;
@@ -18,7 +21,8 @@ export async function GET(req: NextRequest) {
       })
       .populate("user")
       .populate("store")
-      .populate("deliveryBoy");
+      .populate("deliveryBoy")
+      .sort({ createdAt: -1 });
     return NextResponse.json({ orders }, { status: 200 });
   } catch (error) {
     console.error(error);

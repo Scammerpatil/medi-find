@@ -29,19 +29,19 @@ export async function GET(req: NextRequest) {
       if (!user) {
         return NextResponse.json({ error: "User not found" });
       }
-      return NextResponse.json({ data, status: 200 });
+      return NextResponse.json({ data: user, status: 200 });
     } else if (data.role === "medical-store") {
-      const medicalStore = await MedicalStore.find({ email: data.email });
+      const medicalStore = await MedicalStore.findOne({ email: data.email });
       if (!medicalStore) {
         return NextResponse.json({ error: "Medical Store not found" });
       }
-      return NextResponse.json({ data, status: 200 });
+      return NextResponse.json({ data: medicalStore, status: 200 });
     } else if (data.role === "delivery-boy") {
       const deliveryBoy = await DeliveryBoy.findOne({ email: data.email });
       if (!deliveryBoy) {
         return NextResponse.json({ error: "Delivery Boy not found" });
       }
-      return NextResponse.json({ data, status: 200 });
+      return NextResponse.json({ data: deliveryBoy, status: 200 });
     } else {
       return NextResponse.json({ error: "Invalid role" });
     }

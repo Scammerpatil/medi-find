@@ -19,6 +19,7 @@ const Component = ({
     const res = await axios.get("/api/auth/verifytoken");
     if (res.data) {
       setUser(res.data.data);
+      console.log(res.data.data);
     }
   };
   return (
