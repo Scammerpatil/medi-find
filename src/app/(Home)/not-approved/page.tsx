@@ -15,8 +15,8 @@ export default function Home() {
         error: "Error logging out",
       });
       router.push("/");
-    } catch (error) {
-      toast.error("Error logging out:", error);
+    } catch (error: any) {
+      toast.error("Error logging out:", error.toString());
     }
   };
   return (

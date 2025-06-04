@@ -94,7 +94,6 @@ const SignUp = () => {
         name: imageName,
         folderName: folderName,
       });
-      console.log(imageResponse);
       toast.promise(imageResponse, {
         loading: "Uploading Image...",
         success: (data: AxiosResponse) => {

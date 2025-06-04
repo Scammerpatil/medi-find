@@ -1,11 +1,4 @@
-import {
-  IconHome,
-  IconSearch,
-  IconFileUpload,
-  IconShoppingCart,
-  IconBell,
-  IconSettings,
-} from "@tabler/icons-react";
+import { IconHome, IconSearch, IconShoppingCart } from "@tabler/icons-react";
 import { SideNavItem } from "@/types/types";
 
 export const SIDENAV_ITEMS: SideNavItem[] = [

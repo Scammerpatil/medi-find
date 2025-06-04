@@ -89,7 +89,9 @@ const UserPage = () => {
                   </td>
                   <td className="py-3 px-6 flex items-center justify-center gap-2">
                     <button
-                      onClick={() => handleDelete(user._id!)}
+                      onClick={() =>
+                        handleDelete(user._id as unknown as ObjectId)
+                      }
                       className="btn btn-error transition"
                     >
                       <IconTrash size={16} /> Delete

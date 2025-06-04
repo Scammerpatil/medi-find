@@ -5,6 +5,7 @@ import axios from "axios";
 import Link from "next/link";
 import { IconBox, IconShoppingCart } from "@tabler/icons-react";
 import { Medicine } from "@/types/Medicine";
+import { Order } from "@/types/Order";
 
 const MedicalStoreDashboard = () => {
   const { user } = useAuth();
@@ -111,7 +112,7 @@ const MedicalStoreDashboard = () => {
                         <>
                           <td rowSpan={order.medicines.length}>{index + 1}</td>
                           <td rowSpan={order.medicines.length}>
-                            {order.user.name}
+                            {order.user?.name}
                           </td>
                         </>
                       )}
@@ -124,7 +125,7 @@ const MedicalStoreDashboard = () => {
                             ₹ {order.totalAmount.toLocaleString()}
                           </td>
                           <td rowSpan={order.medicines.length}>
-                            {new Date(order.createdAt).toLocaleDateString()}
+                            {new Date(order.createdAt!).toLocaleDateString()}
                           </td>
                           <td
                             rowSpan={order.medicines.length}

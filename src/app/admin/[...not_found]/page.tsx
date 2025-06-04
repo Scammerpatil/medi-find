@@ -1,5 +1,5 @@
 "use client";
-import NotFoundImage from "@/Components/404Image";
+import NotFoundImage from "@/components/404Image";
 import Link from "next/link";
 
 const NotFound = () => {

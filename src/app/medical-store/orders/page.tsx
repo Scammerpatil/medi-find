@@ -134,9 +134,11 @@ const StoreOrdersPage = () => {
                       </option>
                       {deliveryBoys.map((boy: any) => {
                         const roundTripKm =
-                          getDistance(
-                            order.pickupLocation,
-                            order.dropLocation
+                          Number(
+                            getDistance(
+                              order.pickupLocation,
+                              order.dropLocation
+                            )
                           ) * 2;
                         return (
                           <option key={boy._id} value={boy._id}>

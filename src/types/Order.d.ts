@@ -7,6 +7,7 @@ export interface Order {
   user: User | null;
   store: MedicalStore | null;
   deliveryBoy: DeliveryBoy | null;
+  distance?: number;
   medicines: {
     medicineId: string;
     name: string;

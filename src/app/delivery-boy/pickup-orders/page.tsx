@@ -24,12 +24,12 @@ export default function PickupOrdersPage() {
       const res = await axios.get("/api/order/deliveryBoy");
       const enrichedOrders = res.data.map((order: Order) => {
         const pickup = {
-          lat: order.pickupLocation.coordinates[0],
-          lon: order.pickupLocation.coordinates[1],
+          lat: order.pickupLocation.coordinates[0] as number,
+          lon: order.pickupLocation.coordinates[1] as number,
         };
         const drop = {
-          lat: order.dropLocation.coordinates[0],
-          lon: order.dropLocation.coordinates[1],
+          lat: order.dropLocation.coordinates[0] as number,
+          lon: order.dropLocation.coordinates[1] as number,
         };
         const distanceMeters = haversine(pickup, drop);
         return { ...order, distance: distanceMeters / 1000 };
